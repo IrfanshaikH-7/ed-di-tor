@@ -1,0 +1,85 @@
+import 'dotenv/config';
+import express, { Request, Response } from 'express';
+import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import { Variables } from '@modelcontextprotocol/sdk/shared/uriTemplate';
+import { GoogleGenAI } from '@google/genai';
+
+const app = express();
+app.use(express.json());
+
+// Create an MCP server instance
+const server = new McpServer({
+  name: 'demo-server',
+  version: '1.0.0',
+});
+
+// Register the addition tool
+const addHandler = async (
+  { a, b }: { a: number; b: number },
+  _extra: any
+) => ({
+  content: [{ type: 'text', text: String(a + b) } as const],
+});
+server.registerTool(
+  'add',
+  {
+    title: 'Addition Tool',
+    description: 'Add two numbers',
+    inputSchema: { a: z.number(), b: z.number() },
+  },
+  addHandler
+);
+
+// Register the greeting resource
+const greetingHandler = async (
+  uri: URL,
+  variables: Variables,
+  _extra: any
+) => ({
+  contents: [
+    {
+      uri: uri.href,
+      text: `Hello, ${variables.name || ''}!`,
+    },
+  ],
+});
+server.registerResource(
+  'greeting',
+  new ResourceTemplate('greeting://{name}', { list: undefined }),
+  {
+    title: 'Greeting Resource',
+    description: 'Dynamic greeting generator',
+  },
+  greetingHandler
+);
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const ai = GEMINI_API_KEY ? new GoogleGenAI({ apiKey: GEMINI_API_KEY }) : null;
+
+// POST /prompt endpoint
+app.post('/prompt', async (req: Request, res: Response) => {
+  const { prompt } = req.body;
+  try {
+    if (!ai) {
+      return res.status(500).json({ error: 'GEMINI_API_KEY not set in environment.' });
+    }
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-preview-05-20',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    });
+    const text = response.text || 'No response from Gemini.';
+    res.json({
+      content: [
+        { type: 'text', text }
+      ]
+    });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
