@@ -49,7 +49,7 @@ export default function Monaco({
         overviewRulerLanes: 0, // Hides the right overview ruler
         overviewRulerBorder: false,
         renderLineHighlight: "none", // Removes line highlight
-        padding: { top: 3, bottom: 0 },
+        padding: { top: 9, bottom: 0 },
         
       }}
       {...props}

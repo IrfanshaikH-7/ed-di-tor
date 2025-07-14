@@ -1,9 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 html {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
   color-scheme: dark;
 }
 
@@ -15,7 +20,13 @@ html {
   background: none !important;
   display: none !important;
 }
-
+.monaco-diff-editor .synthetic-focus, .monaco-diff-editor [tabindex="-1"]:focus, .monaco-diff-editor [tabindex="0"]:focus, .monaco-diff-editor button:focus, .monaco-diff-editor input[type=button]:focus, .monaco-diff-editor input[type=checkbox]:focus, .monaco-diff-editor input[type=search]:focus, .monaco-diff-editor input[type=text]:focus, .monaco-diff-editor select:focus, .monaco-diff-editor textarea:focus, .monaco-editor {
+  opacity: 1;
+  outline-color: #262626 !important;
+  outline-offset: 0px;
+  outline-style: solid;
+  outline-width: 0px;
+}
 
 @theme inline {
   --color-background: var(--background);
