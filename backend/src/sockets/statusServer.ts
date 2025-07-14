@@ -27,7 +27,7 @@ export function setStatus(status: string) {
     idleTimeout = setTimeout(() => {
       currentStatus = 'idle';
       broadcastStatus();
-    }, 300);
+    }, 1000);
   }
 }
 
@@ -37,4 +37,5 @@ export function getStatus() {
 
 httpServer.listen(8082, () => {
   console.log('Status Socket.IO server running on ws://localhost:8082');
-}); 
+});
+

@@ -1,8 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 
 export async function verifyTestCasesHandler(args: { problem: any; testCases: any[] }, prompt: string, ai: GoogleGenAI) {
-  console.log(`Verifying ${args.testCases.length} test cases for problem: ${args.problem.title}`);
-  
   // Construct prompt for Gemini to verify test cases
   const genPrompt = `You are a test case verification expert. Check if the test cases are correct for this DSA problem.
 
@@ -28,7 +26,6 @@ Return a JSON object with:
 
 Return only the JSON object, no extra text.`;
 
-  console.log('Prompt to Gemini for test case verification:', genPrompt);
   
   const genResponse = await ai.models.generateContent({
     model: 'gemini-2.5-flash-preview-05-20',
@@ -36,7 +33,6 @@ Return only the JSON object, no extra text.`;
   });
 
   // Log the raw Gemini output for debugging
-  console.log('Raw Gemini output for verification:', genResponse.text);
 
   let verificationResult;
   try {
@@ -44,7 +40,6 @@ Return only the JSON object, no extra text.`;
     // Remove Markdown code block if present
     raw = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '');
     verificationResult = JSON.parse(raw);
-    console.log('Parsed verification result:', verificationResult);
   } catch (err) {
     console.error('Failed to parse verification output as JSON:', err);
     console.error('Gemini output was:', genResponse.text);

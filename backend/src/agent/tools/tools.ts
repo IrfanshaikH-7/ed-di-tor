@@ -149,6 +149,16 @@ export const verifyTestCasesDeclaration: FunctionDeclaration = {
   }
 };
 
+export const getSummaryDeclaration = {
+  name: 'getSummary',
+  description: 'Get the summary of the current chat session.',
+  parameters: {},
+  returns: {
+    type: 'string',
+    description: 'The summary of the current chat session.'
+  }
+};
+
 export const toolDeclarations = {
   add: addDeclaration,
   get_dsa_problems: getDsaProblemsDeclaration,

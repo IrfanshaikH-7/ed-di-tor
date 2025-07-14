@@ -28,13 +28,13 @@ console.log('output', output)
             </>
           ) : (
             <>
-              <pre style={{ margin: 0, background: 'transparent', color: 'inherit', fontFamily: 'inherit', whiteSpace: 'pre-wrap' }}>{formatLines(output || 'terminal say somthing')}</pre>
+              <pre style={{ margin: 0, background: 'transparent', color: 'inherit', fontFamily: 'inherit', whiteSpace: 'pre-wrap' }}>{formatLines(output) ? formatLines(output) : <span className='animate-pulse'>...</span> }</pre>
             </>
           )}
         </div>
       ) : (
         <div className='h-full w-full bg-neutral-900/80 rounded-xl p-2'>
-          cases
+          
         </div>
       )}
     </div>

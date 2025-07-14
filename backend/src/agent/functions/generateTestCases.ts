@@ -8,8 +8,7 @@ export async function generateTestCasesHandler(args: { problems: any[]; count?: 
 
   // Process each problem and generate test cases
   for (const problem of args.problems) {
-    setStatus('generating_test_cases');
-    console.log(`Generating test cases for problem: ${problem.title}`);
+    setStatus('Generating testcases');
 
     let testCases = [];
     let attempts = 0;
@@ -18,9 +17,8 @@ export async function generateTestCasesHandler(args: { problems: any[]; count?: 
     while (testCases.length === 0 && attempts < maxAttempts) {
       attempts++;
       if (attempts > 1) {
-        setStatus(`retrying test cases ${attempts}`);
+        setStatus(`Retrying testcases ${attempts}`);
       }
-      console.log(`Attempt ${attempts} for "${problem.title}"`);
 
       // Construct prompt for Gemini to generate test cases for this specific problem
       let genPrompt = `Generate exactly ${count} test cases for this DSA problem:
@@ -62,7 +60,6 @@ Return a JSON array of exactly ${count} test cases, no extra text, no explanatio
         genPrompt += `\n\nIMPORTANT: Previous test cases had issues. Please be extra careful and double-check all calculations.`;
       }
 
-      console.log(`Prompt to Gemini for test cases of "${problem.title}":`, genPrompt);
 
       const genResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash-preview-05-20',
@@ -70,18 +67,15 @@ Return a JSON array of exactly ${count} test cases, no extra text, no explanatio
       });
 
       // Log the raw Gemini output for debugging
-      console.log(`Raw Gemini output for test cases of "${problem.title}":`, genResponse.text);
 
       try {
         let raw = genResponse.text || '[]';
         // Remove Markdown code block if present
         raw = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '');
         testCases = JSON.parse(raw);
-        console.log(`Parsed test cases for "${problem.title}":`, testCases, 'Type:', typeof testCases, 'IsArray:', Array.isArray(testCases));
 
         // Validate test cases - check if they make sense
         if (Array.isArray(testCases) && testCases.length > 0) {
-          console.log(`Validating ${testCases.length} test cases for "${problem.title}"...`);
           // Basic validation: check if input/output structure is correct
           const validTestCases = testCases.filter((tc: any) => {
             return tc && typeof tc === 'object' &&
@@ -103,8 +97,7 @@ Return a JSON array of exactly ${count} test cases, no extra text, no explanatio
             continue;
           }
 
-          console.log(`Verifying test cases for "${problem.title}"...`);
-          setStatus(`verifing test cases for ...`)
+          setStatus(`Verifing testcases for ...`)
           const verificationResult = await verifyTestCasesHandler(
             { problem: problem, testCases: testCases },
             prompt,
@@ -114,7 +107,7 @@ Return a JSON array of exactly ${count} test cases, no extra text, no explanatio
           if (!verificationResult.isValid) {
             // If verification failed, add the issues to the prompt for the next attempt
             if (attempts < maxAttempts) {
-              setStatus('retrying_test_cases');
+              setStatus('Retrying testcases');
               genPrompt += `\n\nPREVIOUS ATTEMPT FAILED VERIFICATION. Issues found:
 ${verificationResult.issues.map((issue: string, i: number) => `${i + 1}. ${issue}`).join('\n')}
 
@@ -126,8 +119,6 @@ Please regenerate test cases and fix these issues. Be extremely careful with cal
               // Return the test cases anyway, but mark them as potentially incorrect
               testCases = validTestCases;
             }
-          } else {
-            console.log(`Test cases for "${problem.title}" passed verification!`);
           }
         } else {
           console.warn(`No valid test cases generated for "${problem.title}", retrying...`);

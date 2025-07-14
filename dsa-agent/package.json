@@ -20,7 +20,9 @@
     "python-shell": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.3",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
     "vm2": "^3.9.19",
     "zustand": "^5.0.6"

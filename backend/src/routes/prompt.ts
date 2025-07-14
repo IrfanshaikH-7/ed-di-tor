@@ -4,9 +4,9 @@ import { handlePrompt } from '../agent/agent';
 const router = Router();
 
 router.post('/', async (req: Request, res: Response) => {
-  const { prompt } = req.body;
+  const { prompt, sessionId } = req.body;
   try {
-    const result = await handlePrompt(prompt);
+    const result = await handlePrompt(prompt, sessionId);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : String(err) });

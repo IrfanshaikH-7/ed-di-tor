@@ -1,5 +1,6 @@
 import Bottom from "@/components/main/bottom/Bottom";
 import Editor from "@/components/main/editor/Editor";
+import Right from "@/components/main/right/Right";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -37,8 +38,8 @@ export default function Initial() {
             <ResizableHandle />
             {/* Right Panel */}
             <ResizablePanel defaultSize={26} minSize={2} maxSize={30}>
-                <div className="flex h-full rounded-2xl bg-neutral-800  items-center justify-center p-4">
-                    <span className="font-semibold">Right</span>
+                <div className="flex h-full rounded-2xl bg-neutral-800  items-center justify-center p-1.5">
+                    <Right/>
                 </div>
             </ResizablePanel>
         </ResizablePanelGroup>
