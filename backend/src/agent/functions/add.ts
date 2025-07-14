@@ -1,5 +1,5 @@
 import { Content, Part, GoogleGenAI, FunctionCallingConfigMode } from '@google/genai';
-import { addDeclaration, getDsaProblemsDeclaration } from '../tools';
+import { addDeclaration, getDsaProblemsDeclaration } from '../tools/tools';
 
 export async function addHandler(args: { a: number; b: number; }) {
   console.log('toolcalll')

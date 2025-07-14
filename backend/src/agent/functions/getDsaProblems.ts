@@ -1,6 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
+import { generateTestCasesHandler } from './generateTestCases';
+import { setStatus } from '../../sockets/statusServer';
 
 export async function getDsaProblemsHandler(args: { topic: string; count: number; prompt?: string }, prompt: string, ai: GoogleGenAI) {
+  setStatus('making questions');
   // Combine topic, count, and user prompt for Gemini
   let genPrompt = `Generate ${args.count} DSA problems on the topic "${args.topic}".`;
   if (args.prompt && args.prompt.trim()) {
@@ -27,8 +30,29 @@ export async function getDsaProblemsHandler(args: { topic: string; count: number
   } catch (err) {
     console.error('Failed to parse Gemini output as JSON:', err);
     console.error('Gemini output was:', genResponse.text);
+    setStatus('failed');
     return { error: 'Failed to parse Gemini output as JSON', raw: genResponse.text };
   }
 
-  return { problems };
+  // Chain: Automatically generate test cases for all problems
+  console.log('Generating test cases for all problems...');
+  const testCasesResponse = await generateTestCasesHandler(
+    { problems: problems, count: 5 }, 
+    prompt, 
+    ai
+  );
+
+  // Combine problems with their test cases
+  const problemsWithTestCases = problems.map((problem: any, index: number) => {
+    const testCases = testCasesResponse.results[index] || [];
+    return {
+      ...problem,
+      testCases: testCases
+    };
+  });
+
+  setStatus('done');
+  return { 
+    problems: problemsWithTestCases
+  };
 } 

@@ -1,14 +1,8 @@
 import { GoogleGenAI, FunctionCallingConfigMode, Content, Part } from '@google/genai';
-import { addDeclaration, getDsaProblemsDeclaration } from './tools';
-import { addHandler } from './functions/add';
-import { getDsaProblemsHandler } from './functions/getDsaProblems';
+import { addDeclaration, getDsaProblemsDeclaration, generateTestCasesDeclaration, verifyTestCasesDeclaration } from './tools/tools';
+import { toolHandlers } from './tools/handler';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-const toolHandlers: Record<string, { handler: (args: any, prompt: string, ai: GoogleGenAI) => Promise<any>, direct: boolean }> = {
-  add: { handler: addHandler, direct: false },
-  get_dsa_problems: { handler: getDsaProblemsHandler, direct: true },
-};
 
 export async function handlePrompt(prompt: string) {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not set in environment.');
@@ -25,7 +19,7 @@ export async function handlePrompt(prompt: string) {
         },
       },
       tools: [
-        { functionDeclarations: [addDeclaration, getDsaProblemsDeclaration] },
+        { functionDeclarations: [addDeclaration, getDsaProblemsDeclaration, generateTestCasesDeclaration, verifyTestCasesDeclaration] },
       ],
     },
   });
@@ -41,6 +35,7 @@ export async function handlePrompt(prompt: string) {
         // Prefer direct from args if present, else from map
         const isDirect = call.args && typeof call.args.direct === 'boolean' ? call.args.direct : direct;
         const result = await handler(call.args, prompt, ai);
+        
         if (isDirect) {
           return { type: 'json', json: result };
         } else {
@@ -71,6 +66,5 @@ export async function handlePrompt(prompt: string) {
       return { error: 'Invalid function call from Gemini.' };
     }
   }
-  // Otherwise, just return the model's text
   return { type: 'text', text: response.text || 'No response from Gemini.' };
 } 
