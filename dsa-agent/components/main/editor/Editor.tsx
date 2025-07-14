@@ -13,7 +13,8 @@ const lang = [
 export default function Editor() {
     const [code, setCode] = useState<string>("// Write your code here\n");
     const [language, setLanguage] = useState<string>("javascript");
-    const setTerminalOutput = useTerminalStore((state: { setOutput: (output: string) => void }) => state.setOutput);
+    const setTerminalOutput = useTerminalStore((state: { setOutput: (output: string) => void, setError?: (error: string) => void }) => state.setOutput);
+    const setTerminalError = useTerminalStore((state: { setError?: (error: string) => void }) => state.setError || (() => {}));
 
     const handleExec = async () => {
         try {
@@ -23,9 +24,19 @@ export default function Editor() {
                 body: JSON.stringify({ code, language })
             });
             const data = await res.json();
-            setTerminalOutput(data.output || data.error || 'No output');
+            if (data.type === 'error') {
+                setTerminalError(data.error);
+                setTerminalOutput('');
+            } else if (data.type === 'success') {
+                setTerminalOutput(data.output || 'No output');
+                setTerminalError('');
+            } else {
+                setTerminalError('Unknown response');
+                setTerminalOutput('');
+            }
         } catch (err) {
-            setTerminalOutput('Execution failed');
+            setTerminalError('Execution failed');
+            setTerminalOutput('');
         }
     };
 console.log(language, code)

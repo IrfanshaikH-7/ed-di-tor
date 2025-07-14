@@ -32,9 +32,9 @@ export const execute = async (req: Request, res: Response) => {
           output += String(result);
         }
       }
-      return res.json({ output });
+      return res.json({ type: 'success', output });
     } catch (err) {
-      return res.json({ error: (err as Error).message });
+      return res.json({ type: 'error', error: (err as Error).message });
     }
   } else if (language === 'python') {
     const filename = `${os.tmpdir()}/${randomUUID()}.py`;
@@ -49,13 +49,13 @@ export const execute = async (req: Request, res: Response) => {
         error = (err as Error).message;
       }
       await unlink(filename);
-      if (error) return res.json({ error });
-      return res.json({ output });
+      if (error) return res.json({ type: 'error', error });
+      return res.json({ type: 'success', output });
     } catch (err) {
       try { await unlink(filename); } catch {}
-      return res.json({ error: (err as Error).message });
+      return res.json({ type: 'error', error: (err as Error).message });
     }
   } else {
-    return res.status(400).json({ error: 'Unsupported language' });
+    return res.status(400).json({ type: 'error', error: 'Unsupported language' });
   }
 };
