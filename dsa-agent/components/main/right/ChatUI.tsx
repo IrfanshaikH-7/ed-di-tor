@@ -4,6 +4,7 @@ import { useStatusStore } from '@/store/statusStore';
 import { Check, Loader2 } from 'lucide-react';
 import React, { useRef, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useQuestionsStore } from '@/store/questionsStore';
 
 export default function ChatUI() {
   const status = useStatusStore(s => s.status);
@@ -42,6 +43,9 @@ export default function ChatUI() {
       });
       const data = await res.json();
       if (data.type === 'json') {
+        if (data?.tool === "get_problems"){
+          useQuestionsStore.getState().updateQuestions(data.problems);
+        }
         setChat(prev => [...prev, { sender: 'bot', message: data.completion }]);
       } else if (data.type === 'text') {
         setChat(prev => [...prev, { sender: 'bot', message: data.text }]);
@@ -77,7 +81,7 @@ export default function ChatUI() {
           ) : (
             <span
               key={idx}
-              className={`block w-fit max-w-[80%] rounded-2xl px-3 py-2 text-sm ml-auto bg-blue-700 text-white`}
+              className={`block w-fit max-w-[88%] rounded-2xl px-3 py-2 text-sm ml-auto bg-blue-700 text-white`}
             >
               {msg.message}
             </span>

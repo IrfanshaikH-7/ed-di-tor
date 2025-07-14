@@ -1,5 +1,6 @@
 import Bottom from "@/components/main/bottom/Bottom";
 import Editor from "@/components/main/editor/Editor";
+import Left from "@/components/main/left/Left";
 import Right from "@/components/main/right/Right";
 import {
     ResizableHandle,
@@ -12,9 +13,9 @@ export default function Initial() {
         <ResizablePanelGroup direction="horizontal" className="h-screen p-2 w-screen rounded-lg border">
             {/* Left Panel */}
             <ResizablePanel defaultSize={25} minSize={20} maxSize={25}>
-                <div className="flex h-full items-center bg-neutral-800 rounded-2xl justify-center p-4 ">
-                    <span className="font-semibold">Left</span>
-                </div>
+                <section className="flex h-full items-center bg-neutral-800 rounded-2xl justify-center p-4 ">
+                    <Left/>
+                </section>
             </ResizablePanel>
             <ResizableHandle />
             {/* Center + Bottom (vertical split) */}
